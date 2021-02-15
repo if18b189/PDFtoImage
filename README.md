@@ -1,7 +1,7 @@
 # PDFtoImage
 
 ## Overview
-I had to convert PDF files to image and decided to use this opportunity to start this project.
+I had to convert a PDF file to image files and decided to use this opportunity to start this project.
 
 ## Screenshots:
 
