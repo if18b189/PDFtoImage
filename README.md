@@ -1,8 +1,7 @@
 # PDFtoImage
 
 ## Overview
-There are plenty of programs to handle PDF files but instead of downloading one I decided to use this opportunity as a programming exercise/new project.
-During the process I used this tutorial [geeksforgeeks.org - Convert PDF to Image using Python](https://www.geeksforgeeks.org/convert-pdf-to-image-using-python/).
+I had to convert PDF files to image and decided to use this opportunity to start this project.
 
 ## Screenshots:
 
@@ -10,17 +9,18 @@ During the process I used this tutorial [geeksforgeeks.org - Convert PDF to Imag
 
 ## Setup & Installation
 
-/
+Installation instructions:
+https://pdf2image.readthedocs.io/en/latest/installation.html
+After installing pdf2image and poppler you should be ready to run the program.
 
 ## Usage & Details
 
-/
+1. Open up a terminal/command line 
+2. Navigate into the project directory
+3. Run the script by typing `python ./src/main.py`
+4. Now a window should appear, where you can select the PDF file you want to convert.
 
 ## Roadmap:
 - [ ] add more buttons and functionalities
 - [ ] select a range of pages to convert
 - [ ] select a specific page to convert
-
-## Credits
-
-* [geeksforgeeks.org - Convert PDF to Image using Python](https://www.geeksforgeeks.org/convert-pdf-to-image-using-python/)
