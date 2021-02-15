@@ -17,7 +17,9 @@ If you are using Windows and do not want to install conda you could also downloa
 ###Instructions using conda:
 1. Open up a terminal/command line 
 2. Navigate into the projects directory
-3. Use `conda install -r requirements.txt` to install the required modules/libraries
+3. Use one of the following lines to install the required modules/libraries
+    * `conda create --name <envName> --file requirements.txt`, to create a new environment and install
+    * `conda install -r requirements.txt`,  to install everything in the current environment
 3. Now you should be ready to start the program
 
 Alternatively you can try the more extensive instructions on installing poppler here:
