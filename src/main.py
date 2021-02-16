@@ -1,35 +1,53 @@
-'''
-https://www.geeksforgeeks.org/convert-pdf-to-image-using-python/
-https://github.com/oschwartz10612/poppler-windows/releases/
-
-set enviroment var for poppler
-
-     You will then have to add the bin/ folder to PATH or use
-
-     poppler_path = r”C:\path\to\poppler-xx\bin” as an argument in convert_from_path.
-
-'''
+import os
+import glob
+import shutil
+import tkinter as tk
+from tkinter import filedialog, messagebox
 
 from pdf2image import convert_from_path
-from tkinter import messagebox
 
-import tkinter as tk
+filePaths = glob.glob(os.getcwd() + '*/*.pdf',
+                      recursive=False)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
+fileIndex = 0
+directory = glob.glob(os.getcwd())[0]
 
-import glob
-import os
-import shutil
+
+def select_folder():
+    global directory
+    directory = filedialog.askdirectory()
+    refresh_folder()
+
+
+def refresh_folder():
+    global filePaths
+    global directory
+
+    lbFileSelection.delete(0, 'end')  # deletes all files in lb
+
+    os.chdir(directory)
+    filePaths = glob.glob(os.getcwd() + '*/*.pdf',
+                          recursive=False)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
+
+    for path in filePaths:
+        path = path.split("\\")[-1]
+        lbFileSelection.insert('end', path)  # inserting each word into tk listbox
 
 
 def convert_selection():
     # try:
-    value = lb.get(lb.curselection())  # getting the path of the selected file
-    selection_label.set(value)  # setting the text to display
+    global filePaths
+    global fileIndex
 
-    filename = value.split("\\")[-1]
+    path = filePaths[fileIndex]
+    print(path)
+
+    value = lbFileSelection.get(lbFileSelection.callbackFileSelection())  # getting the path of the selected file
+    selectionLabel.set(value)  # setting the text to display
+
+    filename = path.split("\\")[-1]
     print(filename)
 
-    images = convert_from_path(
-        filename)  # converting the file to images; argument here is the filename itself NOT the path
+    images = convert_from_path(path)  # converting the file to images; argument here is the filename itself NOT the path
 
     page = 0
 
@@ -37,7 +55,7 @@ def convert_selection():
     print(path)
     os.makedirs(path, exist_ok=True)
 
-    for img in images:  # saving each page as .img in the folder
+    for img in images:  # saving each page as .jpg in the folder
         page += 1
         print(page)
         print(path + '\\' + str(page) + '.jpg')
@@ -45,70 +63,74 @@ def convert_selection():
 
     # try:
 
-    shutil.make_archive(path, "zip", path)
+    if zipFolder:
+        shutil.make_archive(path, "zip", path)
 
 
-# except:
-# 	Result = "zipping failed"
-# 	messagebox.showinfo("Result", Result)
+def callbackFileSelection(event):  # aka
+    # value = listbox.get(lb.curselection())   	# getting the path of the selected file
+    # selection_label.set(value)				# setting the text to display
+    global filePaths
 
-# except:
-# 	Result = "No PDF found"
-# 	messagebox.showinfo("Result", Result)
+    if len(filePaths) == 0:
+        messagebox.showinfo(title="Result", message="Please select a folder containing .pdf files.")
 
-# else:
-# 	Result = "success"
-# 	messagebox.showinfo("Result", Result)
+    else:
+
+        selection = event.widget.curselection()
+
+        global fileIndex
+        fileIndex = selection[0]
 
 
 window = tk.Tk()  # creating a tk application
+
 window.title('PDFtoImage')  # title of the program window
 
-window.geometry('600x300')  # defining the window size
+window.geometry('600x400')  # defining the window size
 
-lb = tk.Listbox(window, width=100)  # creating a listbox
+# frames
 
-files = glob.glob(os.getcwd() + '/**/*.pdf',
-                  recursive=True)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
 
-for file in files:  # inserting each file into the listbox
-    lb.insert('end', file)
+leftFrame = tk.Frame(window)
+leftFrame.pack(side='left')
 
-lb.pack(padx=10, pady=10)  # outer padding for the listbox/listview
+rightFrame = tk.Frame(window)
+rightFrame.pack(side='right')
 
-selection_label = tk.StringVar()
-l = tk.Label(window, bg='green', fg='yellow', font=('Arial', 12), width=60, textvariable=selection_label)
-l.pack(padx=10, pady=10)
+bottomFrame = tk.Frame(window)
+bottomFrame.pack(side='bottom')
 
-b1 = tk.Button(window, text='convert', width=15, height=2, command=convert_selection)
-b1.pack(padx=10, pady=10)
+bottomLeftFrame = tk.Frame(bottomFrame)
+bottomLeftFrame.pack(side='left')
 
-print(files)
+bottomRightFrame = tk.Frame(bottomFrame)
+bottomRightFrame.pack(side='right')
+
+# user interface elements
+
+selectionLabel = tk.Label(window, bg='blue', fg='white', font=('Arial', 14))
+selectionLabel.pack(side="top", fill="x", padx=10, pady=10)
+
+lbFileSelection = tk.Listbox(window, width=30)  # creating a listbox
+lbFileSelection.bind("<<ListboxSelect>>",
+                     callbackFileSelection)  # callback function for listbox ... executes when you select an entry
+lbFileSelection.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, ipady=6)  # outer padding for the listbox/listview
+
+refreshButton = tk.Button(bottomLeftFrame, text='Refresh', width=15, height=2, command=refresh_folder)
+refreshButton.pack(side="left", padx=10, pady=10)
+
+selectFolderButton = tk.Button(bottomLeftFrame, text='Select folder', width=15, height=2, command=select_folder)
+selectFolderButton.pack(side="left", padx=10, pady=10)
+
+convertPdfButton = tk.Button(bottomLeftFrame, text='Convert', width=15, height=2, command=convert_selection)
+convertPdfButton.pack(padx=10, pady=10)
+
+zipFolder = False
+zipFolderCheckbox = tk.Checkbutton(bottomRightFrame, text='Create zipped folder', variable=zipFolder, onvalue=1,
+                                   offvalue=0)
+zipFolderCheckbox.pack(padx=10, pady=10)
+
+refresh_folder()
 
 window.mainloop()
-
-# def pdf2img():
-#     try:
-#         images = convert_from_path(str(e1.get()))
-#         for img in images:
-#             img.save('new_folder\output.jpg', 'JPEG')
-
-#     except  :
-#         Result = "NO pdf found"
-#         messagebox.showinfo("Result", Result)
-
-#     else:
-#         Result = "success"
-#         messagebox.showinfo("Result", Result)
-
-
-# master = Tk()
-# Label(master, text="File Location").grid(row=0, sticky=W)
-
-# e1 = Entry(master)
-# e1.grid(row=0, column=1)
-
-# b = Button(master, text="Convert", command=pdf2img)
-# b.grid(row=0, column=2,columnspan=2, rowspan=2,padx=5, pady=5)
-
-# mainloop()
