@@ -41,11 +41,13 @@ def convert_selection():
     path = filePaths[fileIndex]
     print(path)
 
-    value = lbFileSelection.get(lbFileSelection.callbackFileSelection())  # getting the path of the selected file
-    selectionLabel.set(value)  # setting the text to display
+    # value = lbFileSelection.get(lbFileSelection.callbackFileSelection())  # getting the path of the selected file
+    # selectionLabel.set(value)  # setting the text to display
 
-    filename = path.split("\\")[-1]
-    print(filename)
+    # filename = path.split("\\")[-1]
+    # print(filename)
+
+    # TODO fix convert to images function
 
     images = convert_from_path(path)  # converting the file to images; argument here is the filename itself NOT the path
 
