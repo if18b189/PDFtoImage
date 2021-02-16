@@ -10,17 +10,20 @@ I had to convert a PDF file to image files and decided to use this opportunity t
 ## Setup & Installation
 
 The easiest way of installing this project is by using a conda environment.
-I tried to install python-poppler with pip but didn't manage to make it work.
+I tried to install python-poppler with pip but didn't manage to make it work.(had to download poppler separately)
 
 If you are using Windows and do not want to install conda you could also download the latest poppler release and add the directory of the "bin" folder to your environment variables(PATH).
 
 ###Instructions using conda:
-1. Open up a terminal/command line 
-2. Navigate into the projects directory
-3. Use one of the following lines to install the required modules/libraries
-    * `conda create --name <envName> --file requirements.txt`, to create a new environment and install
-    * `conda install -r requirements.txt`,  to install everything in the current environment
-3. Now you should be ready to start the program
+
+```
+git clone https://github.com/if18b189/PDFtoImage
+cd PDFtoImage
+conda install -r requirements.txt
+   > to install into the current environment
+conda create --name <envName> --file requirements.txt 
+   > to install into a new environment
+```
 
 Alternatively you can try the more extensive instructions on installing poppler here:
 https://pdf2image.readthedocs.io/en/latest/installation.html
