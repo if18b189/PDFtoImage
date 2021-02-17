@@ -136,7 +136,7 @@ master = tk.Tk()  # creating a tk application
 
 master.title('PDFtoImage')  # title of the program window
 
-master.geometry('600x400')  # defining the window size
+master.geometry("")  # defining the window size
 
 # frames
 
@@ -145,7 +145,7 @@ leftFrame = tk.Frame(master)
 leftFrame.pack(side='left')
 
 rightFrame = tk.Frame(master)
-rightFrame.pack(side='right')
+rightFrame.pack(side='right', fill=tk.BOTH, expand=True)
 
 bottomFrame = tk.Frame(master)
 bottomFrame.pack(side='bottom', fill=tk.BOTH, expand=True)
@@ -168,6 +168,29 @@ lbFileSelection = tk.Listbox(master, width=30)  # creating a listbox
 lbFileSelection.bind("<<ListboxSelect>>",
                      callbackFileSelection)  # callback function for listbox ... executes when you select an entry
 lbFileSelection.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, ipady=6)  # outer padding for the listbox/listview
+
+outputFileTypeLabel = tk.Label(rightFrame, text="Output file format:")
+outputFileTypeLabel.pack(side="top", fill="x", padx=10, pady=10)
+
+fileTypeVar1 = tk.IntVar()
+fileTypeRBttn = tk.Radiobutton(rightFrame, text=".jpeg", variable=fileTypeVar1,
+                       value=1)
+fileTypeRBttn.pack(side="top", padx=5, pady=5)
+
+fileTypeVar2 = tk.IntVar()
+fileTypeRBttn2 = tk.Radiobutton(rightFrame, text=".png ", variable=fileTypeVar2,
+                        value=1)
+fileTypeRBttn2.pack(side="top", padx=5, pady=5)
+
+fileTypeVar3 = tk.IntVar()
+fileTypeRBttn3 = tk.Radiobutton(rightFrame, text=".ppm ", variable=fileTypeVar3,
+                        value=1)
+fileTypeRBttn3.pack(side="top", padx=5, pady=5)
+
+fileTypeVar4 = tk.IntVar()
+fileTypeRBttn4 = tk.Radiobutton(rightFrame, text=".tiff", variable=fileTypeVar4,
+                        value=1)
+fileTypeRBttn4.pack(side="top", padx=5, pady=5)
 
 refreshButton = tk.Button(controlsLeftFrame, text='Refresh', width=15, height=2, command=refreshFolder)
 refreshButton.pack(side="left", padx=10, pady=10)
