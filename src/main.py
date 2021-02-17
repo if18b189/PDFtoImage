@@ -1,8 +1,9 @@
 import os
 import glob
 import shutil
+import subprocess
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 
 from pdf2image import convert_from_path
 
@@ -10,6 +11,22 @@ filePaths = glob.glob(os.getcwd() + '*/*.pdf',
                       recursive=False)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
 fileIndex = 0
 directory = glob.glob(os.getcwd())[0]
+
+
+def show_Info():
+    # Toplevel object which will
+    # be treated as a new window
+    newWindow = tk.Toplevel(master)
+
+    # sets the title of the
+    # Toplevel widget
+    newWindow.title("PDF Info")  # add filename - Info
+
+    # sets the geometry of toplevel
+    newWindow.geometry("200x200")
+
+    # A Label widget to show in toplevel
+    Label(newWindow, text="This is a new window").pack()
 
 
 def select_folder():
@@ -44,29 +61,33 @@ def convert_selection():
     # value = lbFileSelection.get(lbFileSelection.callbackFileSelection())  # getting the path of the selected file
     # selectionLabel.set(value)  # setting the text to display
 
-    # filename = path.split("\\")[-1]
-    # print(filename)
+    # print(path.split("\\")[-1])
 
-    # TODO fix convert to images function
-
-    images = convert_from_path(path)  # converting the file to images; argument here is the filename itself NOT the path
+    images = convert_from_path(path)  # converting the file to images
 
     page = 0
 
-    path = os.path.join(os.getcwd(), filename[:-4])
-    print(path)
-    os.makedirs(path, exist_ok=True)
+    proc = subprocess.Popen('pdfinfo ' + path, shell=True, stdout=subprocess.PIPE)
+    for line in proc.stdout:
+        print(line.decode("utf8"))
+    proc.wait()
 
-    for img in images:  # saving each page as .jpg in the folder
-        page += 1
-        print(page)
-        print(path + '\\' + str(page) + '.jpg')
-        img.save(path + '\\' + str(page) + '.jpg', 'JPEG')
-
-    # try:
-
-    if zipFolder:
-        shutil.make_archive(path, "zip", path)
+    # filename = path.split("\\")[-1]  # getting the original .pdf filename for the "images"-folder
+    # path = os.path.join(os.getcwd(), filename[:-4])
+    # print(path)
+    # os.makedirs(path, exist_ok=True)
+    #
+    # for img in images:  # saving each page as .jpg in the folder
+    #     page += 1
+    #     print(page)
+    #     print(path + '\\' + str(page) + '.jpg')
+    #     img.save(path + '\\' + str(page) + '.jpg', 'JPEG')
+    #
+    # # try:
+    #
+    # # zipping option
+    # if zipFolder.get() == 1:
+    #     shutil.make_archive(path, "zip", path)
 
 
 def callbackFileSelection(event):  # aka
@@ -85,54 +106,63 @@ def callbackFileSelection(event):  # aka
         fileIndex = selection[0]
 
 
-window = tk.Tk()  # creating a tk application
+master = tk.Tk()  # creating a tk application
 
-window.title('PDFtoImage')  # title of the program window
+master.title('PDFtoImage')  # title of the program window
 
-window.geometry('600x400')  # defining the window size
+master.geometry('600x400')  # defining the window size
 
 # frames
 
 
-leftFrame = tk.Frame(window)
+leftFrame = tk.Frame(master)
 leftFrame.pack(side='left')
 
-rightFrame = tk.Frame(window)
+rightFrame = tk.Frame(master)
 rightFrame.pack(side='right')
 
-bottomFrame = tk.Frame(window)
-bottomFrame.pack(side='bottom')
+bottomFrame = tk.Frame(master)
+bottomFrame.pack(side='bottom', fill=tk.BOTH, expand=True)
 
-bottomLeftFrame = tk.Frame(bottomFrame)
-bottomLeftFrame.pack(side='left')
+middleFrame = tk.Frame(master)
+middleFrame.pack(side='bottom', fill=tk.BOTH, expand=True)
 
-bottomRightFrame = tk.Frame(bottomFrame)
-bottomRightFrame.pack(side='right')
+controlsLeftFrame = tk.Frame(middleFrame)
+controlsLeftFrame.pack(side='left')
+
+controlsRightFrame = tk.Frame(middleFrame)
+controlsRightFrame.pack(side='right')
 
 # user interface elements
 
-selectionLabel = tk.Label(window, bg='blue', fg='white', font=('Arial', 14))
+selectionLabel = tk.Label(master, bg='blue', fg='white', font=('Arial', 14))
 selectionLabel.pack(side="top", fill="x", padx=10, pady=10)
 
-lbFileSelection = tk.Listbox(window, width=30)  # creating a listbox
+lbFileSelection = tk.Listbox(master, width=30)  # creating a listbox
 lbFileSelection.bind("<<ListboxSelect>>",
                      callbackFileSelection)  # callback function for listbox ... executes when you select an entry
 lbFileSelection.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, ipady=6)  # outer padding for the listbox/listview
 
-refreshButton = tk.Button(bottomLeftFrame, text='Refresh', width=15, height=2, command=refresh_folder)
+refreshButton = tk.Button(controlsLeftFrame, text='Refresh', width=15, height=2, command=refresh_folder)
 refreshButton.pack(side="left", padx=10, pady=10)
 
-selectFolderButton = tk.Button(bottomLeftFrame, text='Select folder', width=15, height=2, command=select_folder)
+selectFolderButton = tk.Button(controlsLeftFrame, text='Select folder', width=15, height=2, command=select_folder)
 selectFolderButton.pack(side="left", padx=10, pady=10)
 
-convertPdfButton = tk.Button(bottomLeftFrame, text='Convert', width=15, height=2, command=convert_selection)
+convertPdfButton = tk.Button(controlsLeftFrame, text='Convert', width=15, height=2, command=convert_selection)
 convertPdfButton.pack(padx=10, pady=10)
 
-zipFolder = False
-zipFolderCheckbox = tk.Checkbutton(bottomRightFrame, text='Create zipped folder', variable=zipFolder, onvalue=1,
+zipFolder = tk.IntVar()
+zipFolderCheckbox = tk.Checkbutton(controlsRightFrame, text='Create zipped folder', variable=zipFolder, onvalue=1,
                                    offvalue=0)
 zipFolderCheckbox.pack(padx=10, pady=10)
 
+progressBar = ttk.Progressbar(bottomFrame, orient="horizontal", length=120, mode="determinate")
+progressBar.pack(side="right", padx=20, pady=10)
+
+showInfoButton = tk.Button(bottomFrame, text='Show info', width=15, height=2, command=show_Info)
+showInfoButton.pack(side="left", padx=10, pady=10)
+
 refresh_folder()
 
-window.mainloop()
+master.mainloop()
