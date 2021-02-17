@@ -1,3 +1,4 @@
+import re
 import os
 import glob
 import shutil
@@ -10,32 +11,49 @@ from pdf2image import convert_from_path
 filePaths = glob.glob(os.getcwd() + '*/*.pdf',
                       recursive=False)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
 fileIndex = 0
+path = ""
 directory = glob.glob(os.getcwd())[0]
 
 
-def show_Info():
-    # Toplevel object which will
-    # be treated as a new window
-    newWindow = tk.Toplevel(master)
+class PdfInfo:
+    def __init__(self, PdfFilePath):
+        self.infoList = []
+        self.pages = 0
 
-    # sets the title of the
-    # Toplevel widget
-    newWindow.title("PDF Info")  # add filename - Info
+        proc = subprocess.Popen('pdfinfo ' + path, shell=True, stdout=subprocess.PIPE)
+        for line in proc.stdout:
+            self.infoList.append(line.decode("utf8").strip())  # .strip() removes '\r\n'
+        print(self.infoList)
 
-    # sets the geometry of toplevel
-    newWindow.geometry("200x200")
+    def showInfoWindow(self):
+        # Toplevel object which will
+        # be treated as a new window
+        newWindow = tk.Toplevel(master)
 
-    # A Label widget to show in toplevel
-    Label(newWindow, text="This is a new window").pack()
+        # sets the title of the
+        # Toplevel widget
+        newWindow.title("PDF Info")  # add filename - Info
+
+        # sets the geometry of toplevel
+        newWindow.geometry("")  # "" means it will automatically resize
+
+        text = tk.Text(newWindow)
+        for lines in self.infoList:
+            text.insert(tk.INSERT, lines + "\n")
+        text.pack(padx=10, pady=10)
+
+    def getPages(self):  # maximum amount of pages
+        self.pages = int(re.search(r'\d+', self.infoList[8]).group())
+        return self.pages
 
 
-def select_folder():
+def selectFolder():
     global directory
     directory = filedialog.askdirectory()
-    refresh_folder()
+    refreshFolder()
 
 
-def refresh_folder():
+def refreshFolder():
     global filePaths
     global directory
 
@@ -49,13 +67,14 @@ def refresh_folder():
         path = path.split("\\")[-1]
         lbFileSelection.insert('end', path)  # inserting each word into tk listbox
 
+    conversionProgressBar["value"] = 0  # resetting the progressbar
 
-def convert_selection():
+
+def convertSelection():
     # try:
-    global filePaths
-    global fileIndex
 
-    path = filePaths[fileIndex]
+    global path
+
     print(path)
 
     # value = lbFileSelection.get(lbFileSelection.callbackFileSelection())  # getting the path of the selected file
@@ -66,34 +85,43 @@ def convert_selection():
     images = convert_from_path(path)  # converting the file to images
 
     page = 0
+    maxPage = PdfInfo(getPath()).getPages()
+    conversionProgressBar["maximum"] = maxPage
 
-    proc = subprocess.Popen('pdfinfo ' + path, shell=True, stdout=subprocess.PIPE)
-    for line in proc.stdout:
-        print(line.decode("utf8"))
-    proc.wait()
+    filename = path.split("\\")[-1]  # getting the original .pdf filename for the "images"-folder
+    path = os.path.join(os.getcwd(), filename[:-4])
+    print(path)
+    os.makedirs(path, exist_ok=True)
 
-    # filename = path.split("\\")[-1]  # getting the original .pdf filename for the "images"-folder
-    # path = os.path.join(os.getcwd(), filename[:-4])
-    # print(path)
-    # os.makedirs(path, exist_ok=True)
-    #
-    # for img in images:  # saving each page as .jpg in the folder
-    #     page += 1
-    #     print(page)
-    #     print(path + '\\' + str(page) + '.jpg')
-    #     img.save(path + '\\' + str(page) + '.jpg', 'JPEG')
-    #
-    # # try:
-    #
-    # # zipping option
-    # if zipFolder.get() == 1:
-    #     shutil.make_archive(path, "zip", path)
+    for img in images:  # saving each page as .jpg in the folder
+
+        conversionProgressBar["value"] += 1
+
+        page += 1
+        print(page)
+        print(path + '\\' + str(page) + '.jpg')
+        img.save(path + '\\' + str(page) + '.jpg', 'JPEG')
+
+    # try:
+
+    # zipping option
+    if zipFolder.get() == 1:
+        shutil.make_archive(path, "zip", path)
 
 
-def callbackFileSelection(event):  # aka
-    # value = listbox.get(lb.curselection())   	# getting the path of the selected file
-    # selection_label.set(value)				# setting the text to display
+def getPdfInfo():
+    PdfInfo(getPath()).showInfoWindow()
+
+
+def getPath():
+    global path
+    return path
+
+
+def callbackFileSelection(event):
     global filePaths
+    global fileIndex
+    global path
 
     if len(filePaths) == 0:
         messagebox.showinfo(title="Result", message="Please select a folder containing .pdf files.")
@@ -101,9 +129,7 @@ def callbackFileSelection(event):  # aka
     else:
 
         selection = event.widget.curselection()
-
-        global fileIndex
-        fileIndex = selection[0]
+        path = filePaths[selection[0]]
 
 
 master = tk.Tk()  # creating a tk application
@@ -143,13 +169,13 @@ lbFileSelection.bind("<<ListboxSelect>>",
                      callbackFileSelection)  # callback function for listbox ... executes when you select an entry
 lbFileSelection.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, ipady=6)  # outer padding for the listbox/listview
 
-refreshButton = tk.Button(controlsLeftFrame, text='Refresh', width=15, height=2, command=refresh_folder)
+refreshButton = tk.Button(controlsLeftFrame, text='Refresh', width=15, height=2, command=refreshFolder)
 refreshButton.pack(side="left", padx=10, pady=10)
 
-selectFolderButton = tk.Button(controlsLeftFrame, text='Select folder', width=15, height=2, command=select_folder)
+selectFolderButton = tk.Button(controlsLeftFrame, text='Select folder', width=15, height=2, command=selectFolder)
 selectFolderButton.pack(side="left", padx=10, pady=10)
 
-convertPdfButton = tk.Button(controlsLeftFrame, text='Convert', width=15, height=2, command=convert_selection)
+convertPdfButton = tk.Button(controlsLeftFrame, text='Convert', width=15, height=2, command=convertSelection)
 convertPdfButton.pack(padx=10, pady=10)
 
 zipFolder = tk.IntVar()
@@ -157,12 +183,12 @@ zipFolderCheckbox = tk.Checkbutton(controlsRightFrame, text='Create zipped folde
                                    offvalue=0)
 zipFolderCheckbox.pack(padx=10, pady=10)
 
-progressBar = ttk.Progressbar(bottomFrame, orient="horizontal", length=120, mode="determinate")
-progressBar.pack(side="right", padx=20, pady=10)
+conversionProgressBar = ttk.Progressbar(bottomFrame, orient="horizontal", length=120, mode="determinate")
+conversionProgressBar.pack(side="right", padx=20, pady=10)
 
-showInfoButton = tk.Button(bottomFrame, text='Show info', width=15, height=2, command=show_Info)
+showInfoButton = tk.Button(bottomFrame, text='Show info', width=15, height=2, command=getPdfInfo)
 showInfoButton.pack(side="left", padx=10, pady=10)
 
-refresh_folder()
+refreshFolder()
 
 master.mainloop()
