@@ -36,6 +36,6 @@ https://pdf2image.readthedocs.io/en/latest/installation.html
 4. Now a window should appear, where you can select the PDF file you want to convert.
 
 ## Roadmap:
-- [ ] add more buttons and functionalities
+- [x] add more buttons and functionalities
 - [ ] select a range of pages to convert
 - [ ] select a specific page to convert
