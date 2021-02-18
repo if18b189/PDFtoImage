@@ -37,5 +37,6 @@ https://pdf2image.readthedocs.io/en/latest/installation.html
 
 ## Roadmap:
 - [x] add more buttons and functionalities
+- [ ] add options to convert into other formats (tiff, png, jpeg, pmm)
 - [ ] select a range of pages to convert
 - [ ] select a specific page to convert
