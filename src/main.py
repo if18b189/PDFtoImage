@@ -131,6 +131,8 @@ def callbackFileSelection(event):
         selection = event.widget.curselection()
         path = filePaths[selection[0]]
 
+def selectOutputType(event):
+
 
 master = tk.Tk()  # creating a tk application
 
