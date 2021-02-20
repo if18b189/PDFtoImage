@@ -93,6 +93,8 @@ def convertSelection():
     print(path)
     os.makedirs(path, exist_ok=True)
 
+    selectOutputType()
+
     for img in images:  # saving each page as .jpg in the folder
 
         conversionProgressBar["value"] += 1
@@ -131,7 +133,26 @@ def callbackFileSelection(event):
         selection = event.widget.curselection()
         path = filePaths[selection[0]]
 
-def selectOutputType(event):
+
+def selectOutputType():
+    choice = fileTypeVar.get()
+    if choice == 1:
+        fileType = ".jpeg"
+
+    elif choice == 2:
+        fileType = ".png"
+
+    elif choice == 3:
+        fileType = ".ppm"
+
+    elif choice == 3:
+        fileType = ".tiff"
+
+    else:
+        fileType = "Invalid selection"
+
+    # return fileType
+    return messagebox.showinfo('PythonGuides', f'You Selected {fileType}.')
 
 
 master = tk.Tk()  # creating a tk application
@@ -174,24 +195,21 @@ lbFileSelection.pack(fill=tk.BOTH, expand=True, padx=10, pady=10, ipady=6)  # ou
 outputFileTypeLabel = tk.Label(rightFrame, text="Output file format:")
 outputFileTypeLabel.pack(side="top", fill="x", padx=10, pady=10)
 
-fileTypeVar1 = tk.IntVar()
-fileTypeRBttn = tk.Radiobutton(rightFrame, text=".jpeg", variable=fileTypeVar1,
-                       value=1)
+fileTypeVar = tk.IntVar()
+fileTypeRBttn = tk.Radiobutton(rightFrame, text=".jpeg", variable=fileTypeVar,
+                               value=1)
 fileTypeRBttn.pack(side="top", padx=5, pady=5)
 
-fileTypeVar2 = tk.IntVar()
-fileTypeRBttn2 = tk.Radiobutton(rightFrame, text=".png ", variable=fileTypeVar2,
-                        value=1)
+fileTypeRBttn2 = tk.Radiobutton(rightFrame, text=".png ", variable=fileTypeVar,
+                                value=2)
 fileTypeRBttn2.pack(side="top", padx=5, pady=5)
 
-fileTypeVar3 = tk.IntVar()
-fileTypeRBttn3 = tk.Radiobutton(rightFrame, text=".ppm ", variable=fileTypeVar3,
-                        value=1)
+fileTypeRBttn3 = tk.Radiobutton(rightFrame, text=".ppm ", variable=fileTypeVar,
+                                value=3)
 fileTypeRBttn3.pack(side="top", padx=5, pady=5)
 
-fileTypeVar4 = tk.IntVar()
-fileTypeRBttn4 = tk.Radiobutton(rightFrame, text=".tiff", variable=fileTypeVar4,
-                        value=1)
+fileTypeRBttn4 = tk.Radiobutton(rightFrame, text=".tiff", variable=fileTypeVar,
+                                value=4)
 fileTypeRBttn4.pack(side="top", padx=5, pady=5)
 
 refreshButton = tk.Button(controlsLeftFrame, text='Refresh', width=15, height=2, command=refreshFolder)
