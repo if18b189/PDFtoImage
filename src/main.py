@@ -9,7 +9,8 @@ from tkinter import filedialog, messagebox, ttk
 from pdf2image import convert_from_path
 
 filePaths = glob.glob(os.getcwd() + '*/*.pdf',
-                      recursive=False)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
+                      recursive=False)  # searching for all .pdf files recursively, returns an array of files with
+# their absolute paths
 fileIndex = 0
 path = ""
 directory = glob.glob(os.getcwd())[0]
@@ -20,7 +21,7 @@ class PdfInfo:
         self.infoList = []
         self.pages = 0
 
-        proc = subprocess.Popen('pdfinfo ' + path, shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.Popen('pdfinfo ' + PdfFilePath, shell=True, stdout=subprocess.PIPE)
         for line in proc.stdout:
             self.infoList.append(line.decode("utf8").strip())  # .strip() removes '\r\n'
         print(self.infoList)
@@ -59,18 +60,23 @@ def refreshFolder():
 
     lbFileSelection.delete(0, 'end')  # deletes all files in lb
 
-    os.chdir(directory)
-    filePaths = glob.glob(os.getcwd() + '*/*.pdf',
-                          recursive=False)  # searching for all .pdf files recursively, returns an array of files with their absolute paths
+    os.chdir(directory)  # changing cwd
+    allPdfPaths = glob.glob(os.getcwd() + '*/*.pdf',
+                            recursive=False)  # searching for all .pdf files recursively, returns an array of files
+    # with their absolute paths
 
-    for path in filePaths:
-        path = path.split("\\")[-1]
-        lbFileSelection.insert('end', path)  # inserting each word into tk listbox
+    for pdfPath in allPdfPaths:
+        pdfPath = pdfPath.split("\\")[-1]  # splitting all the .pdf up
+        lbFileSelection.insert('end', pdfPath)  # inserting each word into tk listbox
 
     conversionProgressBar["value"] = 0  # resetting the progressbar
 
 
 def convertSelection():
+    # TODO: it is necessary to refresh between multiple conversions
+    # TODO: empty folder is being created when you dont select a filetype
+    # TODO: split project up into multiple files?
+
     # try:
 
     global path
@@ -89,7 +95,7 @@ def convertSelection():
     filename = path.split("\\")[-1]  # getting the original .pdf filename for the "images"-folder
     path = os.path.join(os.getcwd(), filename[:-4])
 
-    outputFileType = selectOutputType()             # .jpeg
+    outputFileType = selectOutputType()  # .jpeg
     outputFolder = path + "_" + outputFileType[1:]  # <example folder name>_jpeg
 
     print(path)
@@ -103,7 +109,8 @@ def convertSelection():
         page += 1
         print(page)
         print(outputFolder + '\\' + str(page) + outputFileType)
-        img.save(outputFolder + '\\' + str(page) + outputFileType, 'JPEG')
+        img.save(outputFolder + '\\' + str(page) + outputFileType, outputFileType[1:].upper())  # ( directory + name ,
+        # filetype 'JPEG')
 
     # try:
 
@@ -137,6 +144,7 @@ def callbackFileSelection(event):
 
 def selectOutputType():
     choice = fileTypeVar.get()
+    fileType = ""
     if choice == 1:
         fileType = ".jpeg"
 
@@ -150,12 +158,12 @@ def selectOutputType():
         fileType = ".tiff"
 
     else:
-        messagebox.showinfo("Invalid Selection")
+        messagebox.showerror("No file type selected", "Please select a file type before converting!")
 
     return fileType
 
 
-master = tk.Tk()  # creating a tk application
+master = tk.Tk()  # creating a tk application+
 
 master.title('PDFtoImage')  # title of the program window
 
@@ -196,21 +204,21 @@ outputFileTypeLabel = tk.Label(rightFrame, text="Output file format:")
 outputFileTypeLabel.pack(side="top", fill="x", padx=10, pady=10)
 
 fileTypeVar = tk.IntVar()
-fileTypeRBttn = tk.Radiobutton(rightFrame, text=".jpeg", variable=fileTypeVar,
-                               value=1)
-fileTypeRBttn.pack(side="top", padx=5, pady=5)
+fileTypeRBtn = tk.Radiobutton(rightFrame, text=".jpeg", variable=fileTypeVar,
+                              value=1)
+fileTypeRBtn.pack(side="top", padx=5, pady=5)
 
-fileTypeRBttn2 = tk.Radiobutton(rightFrame, text=".png ", variable=fileTypeVar,
-                                value=2)
-fileTypeRBttn2.pack(side="top", padx=5, pady=5)
+fileTypeRBtn2 = tk.Radiobutton(rightFrame, text=".png ", variable=fileTypeVar,
+                               value=2)
+fileTypeRBtn2.pack(side="top", padx=5, pady=5)
 
-fileTypeRBttn3 = tk.Radiobutton(rightFrame, text=".ppm ", variable=fileTypeVar,
-                                value=3)
-fileTypeRBttn3.pack(side="top", padx=5, pady=5)
+fileTypeRBtn3 = tk.Radiobutton(rightFrame, text=".ppm ", variable=fileTypeVar,
+                               value=3)
+fileTypeRBtn3.pack(side="top", padx=5, pady=5)
 
-fileTypeRBttn4 = tk.Radiobutton(rightFrame, text=".tiff", variable=fileTypeVar,
-                                value=4)
-fileTypeRBttn4.pack(side="top", padx=5, pady=5)
+fileTypeRBtn4 = tk.Radiobutton(rightFrame, text=".tiff", variable=fileTypeVar,
+                               value=4)
+fileTypeRBtn4.pack(side="top", padx=5, pady=5)
 
 refreshButton = tk.Button(controlsLeftFrame, text='Refresh', width=15, height=2, command=refreshFolder)
 refreshButton.pack(side="left", padx=10, pady=10)
