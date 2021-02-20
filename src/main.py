@@ -75,8 +75,6 @@ def convertSelection():
 
     global path
 
-    print(path)
-
     # value = lbFileSelection.get(lbFileSelection.callbackFileSelection())  # getting the path of the selected file
     # selectionLabel.set(value)  # setting the text to display
 
@@ -90,10 +88,13 @@ def convertSelection():
 
     filename = path.split("\\")[-1]  # getting the original .pdf filename for the "images"-folder
     path = os.path.join(os.getcwd(), filename[:-4])
-    print(path)
-    os.makedirs(path, exist_ok=True)
 
-    selectOutputType()
+    outputFileType = selectOutputType()             # .jpeg
+    outputFolder = path + "_" + outputFileType[1:]  # <example folder name>_jpeg
+
+    print(path)
+
+    os.makedirs(outputFolder, exist_ok=True)
 
     for img in images:  # saving each page as .jpg in the folder
 
@@ -101,14 +102,14 @@ def convertSelection():
 
         page += 1
         print(page)
-        print(path + '\\' + str(page) + '.jpg')
-        img.save(path + '\\' + str(page) + '.jpg', 'JPEG')
+        print(outputFolder + '\\' + str(page) + outputFileType)
+        img.save(outputFolder + '\\' + str(page) + outputFileType, 'JPEG')
 
     # try:
 
     # zipping option
     if zipFolder.get() == 1:
-        shutil.make_archive(path, "zip", path)
+        shutil.make_archive(outputFolder, "zip", outputFolder)
 
 
 def getPdfInfo():
@@ -149,10 +150,9 @@ def selectOutputType():
         fileType = ".tiff"
 
     else:
-        fileType = "Invalid selection"
+        messagebox.showinfo("Invalid Selection")
 
-    # return fileType
-    return messagebox.showinfo('PythonGuides', f'You Selected {fileType}.')
+    return fileType
 
 
 master = tk.Tk()  # creating a tk application
