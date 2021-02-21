@@ -100,12 +100,18 @@ class PdfInfo:
 
 
 def selectFolder():
+    """
+    Prompts the user to select a directory/folder.
+    """
     global directory
     directory = filedialog.askdirectory()
     refreshFolder()
 
 
 def refreshFolder():
+    """
+    Scans(recursively) the current directory for pdf files, updates listbox entries, resets "conversionProgressBar".
+    """
     global filePaths
     global directory
 
@@ -126,11 +132,7 @@ def refreshFolder():
 def convertSelection():
     """
     Converts the selected Pdf file into images.
-    
-    :return: 
-    :rtype:
     """
-
     # TODO: empty folder is being created when you dont select a filetype
     # TODO: split project up into multiple files?
     # TODO: selecting files after selecting a different folder -> indexerror: list index out of range
@@ -180,15 +182,30 @@ def convertSelection():
 
 
 def getPdfInfo():
+    """
+    Opens a window that contains pdf metadata.
+    """
     PdfInfo(getPath()).showInfoWindow()
 
 
 def getPath():
+    """
+    Get the pdf file path.
+
+    Returns:
+        path (str): A string containing the pdfs file path.
+    """
     global path
     return path
 
 
 def callbackFileSelection(event):
+    """
+    Is being called everytime the user selects a file from the listbox(lbFileSelection).
+
+    Parameters:
+        event (event): Triggers when you select an item from the specified listbox.
+    """
     global filePaths
     global fileIndex
     global path
@@ -208,8 +225,8 @@ def selectOutputType():
     '''
     Returns the selected image file type as a string.
 
-    :return:
-    :rtype:
+    Returns:
+        fileType (str): A string representing the filetype, ".jpeg" as an example.
     '''
 
     choice = fileTypeVar.get()
