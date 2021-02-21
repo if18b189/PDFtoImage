@@ -1,4 +1,5 @@
-"""
+"""PDFtoImage
+
 Convert Pdf files into image files(.jpeg, .png, .ppm, .tiff).
 Show Information about the Pdf file.
 
@@ -25,7 +26,6 @@ Misc variables:
 
 """
 
-
 import re
 import os
 import glob
@@ -45,16 +45,33 @@ directory = glob.glob(os.getcwd())[0]
 
 
 class PdfInfo:
-    def __init__(self, PdfFilePath):
+    """ 
+    This class contains information about the pdf file.
+
+    Attributes:
+        infoList (str[]): A list of the metadata, extracted from the pdf.
+        pages (int): Number of pages.
+    """
+
+    def __init__(self, pdfFilePath):
+        """
+        The constructor for PdfInfo class.
+
+        Parameters:
+            pdfFilePath (str): Path of the pdf file.
+        """
         self.infoList = []
         self.pages = 0
 
-        proc = subprocess.Popen('pdfinfo ' + PdfFilePath, shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.Popen('pdfinfo ' + pdfFilePath, shell=True, stdout=subprocess.PIPE)
         for line in proc.stdout:
             self.infoList.append(line.decode("utf8").strip())  # .strip() removes '\r\n'
         print(self.infoList)
 
     def showInfoWindow(self):
+        """
+        Opens a new window containing all Information extracted from the pdf.
+        """
         # Toplevel object which will
         # be treated as a new window
         newWindow = tk.Toplevel(master)
@@ -72,12 +89,17 @@ class PdfInfo:
         text.pack(padx=10, pady=10)
 
     def getPages(self):  # maximum amount of pages
+        """
+        Gets and returns the number of pages.
+
+        Returns:
+            pages (int): Number of pages.
+        """
         self.pages = int(re.search(r'\d+', self.infoList[8]).group())
         return self.pages
 
 
 def selectFolder():
-
     global directory
     directory = filedialog.askdirectory()
     refreshFolder()
@@ -115,7 +137,7 @@ def convertSelection():
 
     # try:
 
-    refreshFolder() # fixed the following issue: it is necessary to refresh between multiple conversions
+    refreshFolder()  # fixed the following issue: it is necessary to refresh between multiple conversions
 
     global path
 
