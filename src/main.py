@@ -1,3 +1,31 @@
+"""
+Convert Pdf files into image files(.jpeg, .png, .ppm, .tiff).
+Show Information about the Pdf file.
+
+Classes:
+
+    PdfInfo
+
+Functions:
+
+    selectFolder()
+    refreshFolder()
+    convertSelection()
+    getPdfInfo()
+    getPath() -> string
+    callbackFileSelection(event)
+    selectOutputType() -> string
+
+Misc variables:
+
+    filePaths
+    fileIndex
+    path
+    directory
+
+"""
+
+
 import re
 import os
 import glob
@@ -49,6 +77,7 @@ class PdfInfo:
 
 
 def selectFolder():
+
     global directory
     directory = filedialog.askdirectory()
     refreshFolder()
@@ -73,11 +102,20 @@ def refreshFolder():
 
 
 def convertSelection():
-    # TODO: it is necessary to refresh between multiple conversions
+    """
+    Converts the selected Pdf file into images.
+    
+    :return: 
+    :rtype:
+    """
+
     # TODO: empty folder is being created when you dont select a filetype
     # TODO: split project up into multiple files?
+    # TODO: selecting files after selecting a different folder -> indexerror: list index out of range
 
     # try:
+
+    refreshFolder() # fixed the following issue: it is necessary to refresh between multiple conversions
 
     global path
 
@@ -139,10 +177,19 @@ def callbackFileSelection(event):
     else:
 
         selection = event.widget.curselection()
+        print(selection)
         path = filePaths[selection[0]]
+        print(filePaths)
 
 
 def selectOutputType():
+    '''
+    Returns the selected image file type as a string.
+
+    :return:
+    :rtype:
+    '''
+
     choice = fileTypeVar.get()
     fileType = ""
     if choice == 1:
