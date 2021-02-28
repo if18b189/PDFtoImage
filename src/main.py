@@ -133,6 +133,7 @@ def refreshFolder():
 
 
 def convertImgToPdf():
+    # TODO: add orientation setting for pdf
 
     folder = filedialog.askdirectory()
 
@@ -152,6 +153,7 @@ def convertImgToPdf():
     pdf.output(os.getcwd() + "test.pdf", "F")
 
     print("done")
+
 
 def convertSelection():
     """
