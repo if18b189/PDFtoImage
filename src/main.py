@@ -34,6 +34,9 @@ import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
+from fpdf import FPDF
+from PIL import Image
+
 from pdf2image import convert_from_path
 
 filePaths = glob.glob(os.getcwd() + '*/*.pdf',
@@ -128,6 +131,27 @@ def refreshFolder():
 
     conversionProgressBar["value"] = 0  # resetting the progressbar
 
+
+def convertImgToPdf():
+
+    folder = filedialog.askdirectory()
+
+    imagePaths = glob.glob(folder + '*/*.jpg',
+                           recursive=False)  # searching for all .jpeg files in the folder
+
+    cover = Image.open(imagePaths[0])
+
+    width, height = cover.size
+
+    pdf = FPDF(unit="pt", format=[width, height])
+
+    for page in imagePaths:
+        pdf.add_page()
+        pdf.image(page, 0, 0)
+
+    pdf.output(os.getcwd() + "test.pdf", "F")
+
+    print("done")
 
 def convertSelection():
     """
@@ -325,6 +349,9 @@ conversionProgressBar.pack(side="right", padx=20, pady=10)
 
 showInfoButton = tk.Button(bottomFrame, text='Show info', width=15, height=2, command=getPdfInfo)
 showInfoButton.pack(side="left", padx=10, pady=10)
+
+convertImageButton = tk.Button(bottomFrame, text='Convert Images', width=15, height=2, command=convertImgToPdf)
+convertImageButton.pack(side="left", padx=10, pady=10)
 
 refreshFolder()
 
