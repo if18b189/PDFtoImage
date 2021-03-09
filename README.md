@@ -14,7 +14,7 @@ I tried to install python-poppler with pip but didn't manage to make it work.(ha
 
 If you are using Windows and do not want to install conda you could also download the latest poppler release and add the directory of the "bin" folder to your environment variables(PATH).
 
-###Instructions using conda:
+### Instructions using conda:
 
 ```
 git clone https://github.com/if18b189/PDFtoImage
